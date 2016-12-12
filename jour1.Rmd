@@ -103,6 +103,7 @@ knitr::include_graphics("./img/data-science-explore.png")
 ## Importez votre premier jeu de données !
 
 ```{r }
+library(tidyverse)
 small_logs <- read_csv("../data/small_logs.csv")
 
 ```
