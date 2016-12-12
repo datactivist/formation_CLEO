@@ -1,0 +1,118 @@
+---
+title: "Introduction à R"
+author: CLEO et datactivi.st
+ratio: 16x10
+output:
+  rmdshower::shower_presentation:
+    self_contained: false
+    katex: true
+    theme: ribbon
+    incremental: true
+---
+
+## Introduction à R
+
+
+<p></p>
+<p></p><p></p><p>
+[Joël Gombin](mailto:joel@datactivi.st) et [Samuel Goëta](samuel@datactivi.st) ([datactivi.st](http://datactivi.st))
+</p>
+<p>
+Retrouvez les matériaux sur https://github.com/datactivist/formation_CLEO 
+<!--- mettre les docs sur l'instance rstudio en ligne et les faire compiler pour garantir la confidentialité ? --->
+</p>
+
+<p>
+Pad collaboratif : https://frama.link/cleo
+</p>
+
+
+## Faisons connaissance
+
+https://frama.link/formationR
+
+
+## One tool to rule them all
+
+- R a comme avantage d'être un langage de programmation (= potentiel illimité) pensé exprès pour la manipulation des données (= usabilité, flexibilité)
+- au fil du temps, devenu un "general purpose tool"
+- permet d'interfacer de nombreux outils plus spécialisés
+- une communauté très dynamique (free software)
+- une syntaxe de plus en plus facile
+- des progrès vers [des bouts de GUI](https://rstudio.github.io/rstudioaddins/)
+
+## Se faire aider
+
+   * Un livre sur R : [R for Data Science](http://r4ds.had.co.nz) de G. Grolemund et H. Wickham 
+   * blogs : https://www.r-bloggers.com (un/des carnets hypothèses: https://quanti.hypotheses.org/, https://politbistro.hypotheses.org)
+   * des listes de diffusion thématiques (ex : [la liste quanti](mailto:quanti@groupes.renater.fr), semin-r@mnhn.fr, r-soc@groupes.renater.fr), des forums (http://forums.cirad.fr/logiciel-R/)
+   * un site de Q/R communautaires : http://stackoverflow.com/tagged/r
+   * twitter avec le hashtag [#Rstats](https://twitter.com/search?q=%23rstats)
+   * les [meetup R](https://www.meetup.com/fr-FR/R-user-group-Aix-Marseille)
+
+## Installation de R et Rstudio
+
+   * [Installation de R](https://cloud.r-project.org/)
+   * Sous windows télécharger [R Tools](https://cran.r-project.org/bin/windows/Rtools/)
+   * Sous MacOS X il faut probablement [installer les "command line tools" ou un compilateur gcc](https://github.com/kennethreitz/osx-gcc-installer) (pour pouvoir compiler des packages lorsque nécessaire)
+   * Installer ensuite [Rstudio](https://www.rstudio.com/products/rstudio/download/preview/)
+
+## Prise en main de Rstudio
+
+- raccourci pour exécuter une ligne de code : ctrl + entrée, pomme + entrée pour Mac
+
+## Scripts, litterate programming, reproducible research
+
+- toujours travailler dans le cadre d'un "projet"
+- ne jamais travailler dans la console
+- écrire des scripts
+- mieux : mêler texte et code au moyen de [fichiers Rmd](http://rmarkdown.rstudio.com/)
+- versionage (git)
+- notebook
+- commentez ! (avec le #)
+
+```{r}
+# ceci est un commentaire
+```
+
+## Le workflow de l'analyse de données : 
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("./img/data-science-explore.png")
+```
+
+## Installation du tidyverse
+
+* Le `tidyverse` (ou hadleyverse) opérationnalise le workflow
+* Pour installer le tidyverse, entrez dans la console : `install.packages("tidyverse")` (ou via Rstudio)
+* `library(tidyverse)` => charge le package
+
+# Importer des données
+
+## En GUI ou en CLI
+
+- bouton "Import dataset"
+- en CLI : package `readr` pour le CSV, `haven` pour SPSS / SAS / Stata, `readxl` pour le XLS(X), `rio` pour (presque) tout le reste
+
+## Importez votre premier jeu de données !
+
+- chargement de package : `library(readr)`
+- Attention à l'assignation : `monjeudedonnees <- read_csv("monfichier.csv")` 
+- Commençons avec un (petit) extrait de logs (préprocessés par graylog)
+
+## Importez votre premier jeu de données !
+
+```{r }
+small_logs <- read_csv("../data/small_logs.csv")
+
+```
+
+## Importez votre premier jeu de données !
+
+Si besoin, ajuster l'import au moyen des arguments `col_types`, `locale` ou encore `na`
+
+small_logs <- read_csv("../data/small_logs.csv")
+
+
+
+
