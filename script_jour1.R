@@ -76,3 +76,10 @@ logs %>%
   summarise(n = n()) %>% 
   arrange(desc(n))
   
+# passer en format long et vice versa
+
+logs %>% 
+  mutate(ID = row_number()) %>% 
+  gather(clé, valeur, -ID) %>% 
+  spread(clé, valeur) %>% 
+  mutate(timestamp = lubridate::as_datetime(as.integer(timestamp)))
