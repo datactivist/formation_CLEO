@@ -46,7 +46,7 @@ https://frama.link/formationR
    * Un livre sur R : [R for Data Science](http://r4ds.had.co.nz) de G. Grolemund et H. Wickham 
    * blogs : https://www.r-bloggers.com (un/des carnets hypothèses: https://quanti.hypotheses.org/, https://politbistro.hypotheses.org)
    * des listes de diffusion thématiques (ex : [la liste quanti](mailto:quanti@groupes.renater.fr), semin-r@mnhn.fr, r-soc@groupes.renater.fr), des forums (http://forums.cirad.fr/logiciel-R/)
-   * un site de Q/R communautaires : http://stackoverflow.com/tagged/r
+   * un site de Q/R communautaires : http://stackoverflow.com/questions/tagged/r
    * twitter avec le hashtag [#Rstats](https://twitter.com/search?q=%23rstats)
    * les [meetup R](https://www.meetup.com/fr-FR/R-user-group-Aix-Marseille)
 
