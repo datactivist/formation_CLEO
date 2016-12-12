@@ -186,11 +186,27 @@ knitr::include_graphics("./img/tidy-1.png")
 
 ## La notion de tidy data
 
-- Mettre chaque jeu de données dans un `tibble`
-- Mettre chaque variable dans une colonne 
+- À chaque observation sa propre ligne
+- À chaque variable sa colonne
+- À chaque valeur sa propre cellule > 1 jeu de données par table, dite “tibble”
+
 
 ## Un exemple de untidy data
 
 https://www.data.gouv.fr/fr/datasets/election-presidentielle-2012-resultats-572126/
 
+## Préparer des tidy data
+
+- `dplyr` et `tidyr`
+- le pipe : `%>%` (ctrl + shift + M)
+- les verbes : `select`, `filter`, `mutate`, `group_by`, `aggregate`
+- `stringr` peut utilement aaccompagner
+
+## Pivoter
+
+`gather` et `spread`
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("http://r4ds.had.co.nz/images/tidy-9.png")
+```
 
