@@ -1,5 +1,5 @@
-library(rio)
-logs <- import("../data/small_logs.csv")
+# library(rio)
+# logs <- import("../data/small_logs.csv")
 
 library(readr)
 logs <- read_csv("../data/small_logs.csv", 
@@ -50,8 +50,29 @@ logs %>%
   summarise(n = n()) %>% 
   arrange(desc(n))
 
+library(rex)
+rex_mode()
+valid_chars <- rex(one_of(regex('a-z0-9\u00a1-\uffff')))
+
+re <- rex(
+  #host name
+  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')),
+  #domain name
+  capture(name = "top_domaine",
+    group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars))
+    ),
+  #TLD identifier
+  group('.', valid_chars %>% at_least(2))
+)
+
+
 logs %>% 
   filter(!domain %in% c("core.openedition.org", "f-origin.hypotheses.org")) %>% 
   filter(!is.na(domain)) %>% 
   filter(!str_detect(clientip, "192.168.178")) %>% 
-  filter(!str_detect(clientip, "193.48.96")) 
+  filter(!str_detect(clientip, "193.48.96")) %>% 
+  mutate(top_domaine = re_matches(domain, re)$top_domaine) %>% 
+  group_by(top_domaine) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
+  
