@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Introduction à R</title>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="jour2_files/rmdshower/node_modules/shower-ribbon/styles/screen-4x3.css">
+  <link rel="stylesheet" href="jour2_files/rmdshower/style-common.css">
+  <link rel="stylesheet" href="jour2_files/rmdshower/style-ribbon.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+  <script src="jour2_files/rmdshower/auto-render.min.js" type="text/javascript"></script>
+  
+  
+    <style type="text/css">
+   div.sourceCode { overflow-x: auto; }
+   table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+     margin: 0; padding: 0; vertical-align: baseline; border: none; }
+   table.sourceCode { width: 100%; line-height: 100%; }
+   td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+   td.sourceCode { padding-left: 5px; }
+   code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+   code > span.dt { color: #902000; } /* DataType */
+   code > span.dv { color: #40a070; } /* DecVal */
+   code > span.bn { color: #40a070; } /* BaseN */
+   code > span.fl { color: #40a070; } /* Float */
+   code > span.ch { color: #4070a0; } /* Char */
+   code > span.st { color: #4070a0; } /* String */
+   code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+   code > span.ot { color: #007020; } /* Other */
+   code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+   code > span.fu { color: #06287e; } /* Function */
+   code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+   code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+   code > span.cn { color: #880000; } /* Constant */
+   code > span.sc { color: #4070a0; } /* SpecialChar */
+   code > span.vs { color: #4070a0; } /* VerbatimString */
+   code > span.ss { color: #bb6688; } /* SpecialString */
+   code > span.im { } /* Import */
+   code > span.va { color: #19177c; } /* Variable */
+   code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+   code > span.op { color: #666666; } /* Operator */
+   code > span.bu { } /* BuiltIn */
+   code > span.ex { } /* Extension */
+   code > span.pp { color: #bc7a00; } /* Preprocessor */
+   code > span.at { color: #7d9029; } /* Attribute */
+   code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+   code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+   code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+   code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+      <script src="jour2_files/htmlwidgets-0.8/htmlwidgets.js"></script>
+    <script src="jour2_files/d3-3.3.8/d3.min.js"></script>
+    <script src="jour2_files/dagre-0.4.0/dagre-d3.min.js"></script>
+    <link href="jour2_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet" />
+    <script src="jour2_files/mermaid-0.3.0/dist/mermaid.slim.min.js"></script>
+    <link href="jour2_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+    <script src="jour2_files/chromatography-0.1/chromatography.js"></script>
+    <script src="jour2_files/DiagrammeR-binding-0.8.4/DiagrammeR.js"></script>
+  
+</head>
+
+<body class="shower list">
+
+  <header class="caption">
+    <h1>Introduction à R</h1>
+    <p>CLEO et datactivi.st</p>
+  </header>
+
+    
+  
+<section id="introduction-a-r" class="slide level2">
+<h2>Introduction à R</h2>
+<p>
+</p>
+<p>
+</p>
+<p>
+</p>
+<p>
+<a href="mailto:joel@datactivi.st">Joël Gombin</a> et <a href="samuel@datactivi.st">Samuel Goëta</a> (<a href="http://datactivi.st">datactivi.st</a>)
+</p>
+<p>
+Retrouvez les matériaux sur <a href="https://github.com/datactivist/formation_CLEO" class="uri">https://github.com/datactivist/formation_CLEO</a>
+</p>
+<p>
+Pad collaboratif : <a href="https://frama.link/cleo" class="uri">https://frama.link/cleo</a>
+</p>
+</section>
+<section id="objectifs-de-la-journee" class="slide level2">
+<h2>Objectifs de la journée</h2>
+<div id="htmlwidget-2bb055ced8695a5ed5f3" style="width:768px;height:470.4px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2bb055ced8695a5ed5f3">{"x":{"diagram":"\ngraph LR\n  Importer -->  Nettoyer\n  Nettoyer --> Transformer\n  Transformer --> Visualiser\n  Visualiser --> Modeliser\n  Modeliser --> Transformer\n  Modeliser --> Communiquer"},"evals":[],"jsHooks":[]}</script>
+</section>
+<section id="objectifs-de-la-journee-1" class="slide level2">
+<h2>Objectifs de la journée</h2>
+<ul>
+<li class="fragment next">acquérir des données “en conditions réelles”</li>
+<li class="fragment next">solidifer les acquis d’hier (tidy et transform)</li>
+<li class="fragment next">apprendre à visualiser les données</li>
+</ul>
+</section>
+<section id="acquerir-des-donnees-en-conditions-reelles" class="titleslide slide level1"><h2 class="shout">Acquérir des données “en conditions réelles”</h2></section><section id="acquerir-des-donnees-en-conditions-reelles-1" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p><a href="http://logs.openedition.org" class="uri">http://logs.openedition.org</a> =&gt; explorer des agrégats de logs</p>
+<p>Possibilité de copier/coller les tableaux en local grâce à <a href="https://github.com/MilesMcBain/datapasta"><code>datapasta</code></a> (mais pas sur Rstudio server :/)</p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-2" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p>indicateurs qualité =&gt; <a href="https://tools.labocleo.org/indicateurs/" class="uri">https://tools.labocleo.org/indicateurs/</a></p>
+<p>Possibilité de télécharger CSV/lire depuis l’URL :</p>
+<p>Voir la page <a href="https://tools.labocleo.org/indicateurs/qualOE1.php?pf=OB" class="uri">https://tools.labocleo.org/indicateurs/qualOE1.php?pf=OB</a> par exemple</p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-3" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;./auth.R&quot;</span>, <span class="dt">local =</span> <span class="ot">TRUE</span>)  <span class="co"># pour ne pas publier vos identifiants</span>
+<span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(httr)
+indicateur &lt;-<span class="st"> </span><span class="kw">GET</span>(<span class="st">&quot;https://tools.labocleo.org/indicateurs/qualOE1.php?startYear=2009&amp;endYear=2016&amp;o=csv&amp;pf=OB&amp;index=openedition&quot;</span>, 
+    auth) %&gt;%<span class="st"> </span><span class="kw">content</span>(<span class="dt">as =</span> <span class="st">&quot;text&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">read_tsv</span>()
+<span class="kw">glimpse</span>(indicateur)</code></pre></div>
+<pre><code>Observations: 59
+Variables: 5
+$ Notice    &lt;int&gt; 631, 190, 707, 793, 783, 845, 705, 204, 222, 689, 70...
+$ Type      &lt;chr&gt; &quot;editeur&quot;, &quot;editeur&quot;, &quot;editeur&quot;, &quot;editeur&quot;, &quot;editeur...
+$ Nom court &lt;chr&gt; &quot;aaccademia&quot;, &quot;ifra&quot;, &quot;puam&quot;, &quot;allianceathena&quot;, &quot;alp...
+$ Url Site  &lt;chr&gt; &quot;http://books.openedition.org/aaccademia&quot;, &quot;http://b...
+$ Titre     &lt;chr&gt; &quot;Accademia University Press&quot;, &quot;Institut français de ...</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-4" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p>Graylog =&gt; <a href="https://graylog.labocleo.org/" class="uri">https://graylog.labocleo.org/</a></p>
+<p>Exploration interactive des logs (quelques jours ?)</p>
+<p>Possibilités d’export CSV : voir <code>../data/graylog_hypo_1d.csv</code></p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-5" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logs &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;../data/graylog_hypo_1d.csv&quot;</span>)
+<span class="kw">glimpse</span>(logs)</code></pre></div>
+<pre><code>Observations: 3,193,158
+Variables: 10
+$ timestamp          &lt;dttm&gt; 2016-11-23 13:39:38, 2016-11-24 01:22:16, ...
+$ agent              &lt;chr&gt; &quot;\&quot;Twitterbot/1.0\&quot;&quot;, &quot;\&quot;Mozilla/5.0 (Windo...
+$ clientip           &lt;chr&gt; &quot;199.16.157.182&quot;, &quot;54.157.182.52&quot;, &quot;207.46....
+$ domain             &lt;chr&gt; &quot;russeurope.hypotheses.org&quot;, &quot;mittelalter.h...
+$ geoip_city_name    &lt;chr&gt; &quot;San Francisco&quot;, &quot;Ashburn&quot;, &quot;Redmond&quot;, &quot;Red...
+$ geoip_country_name &lt;chr&gt; &quot;United States&quot;, &quot;United States&quot;, &quot;United S...
+$ geoip_latitude     &lt;dbl&gt; 37.7697, 39.0335, 47.6801, 47.6801, 47.6801...
+$ geoip_longitude    &lt;dbl&gt; -122.3933, -77.4838, -122.1206, -122.1206, ...
+$ request            &lt;chr&gt; &quot;http://russeurope.hypotheses.org/4035&quot;, &quot;h...
+$ verb               &lt;chr&gt; &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;...</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-6" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p>Exercice : explorer ces logs</p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-7" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p>Utiliser la base elasticsearch sous-jacente à graylogs :</p>
+<ul>
+<li class="fragment next">elasticsearch : serveur d’indexation et de recherche de données</li>
+<li class="fragment next">contient des “index”</li>
+<li class="fragment next">package <code>elastic</code></li>
+</ul>
+<p>À suivre : <a href="https://github.com/ropensci/elasticdsl" class="uri">https://github.com/ropensci/elasticdsl</a></p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-8" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(elastic)
+<span class="kw">connect</span>()  <span class="co">#passer des paramètres spécifiques si besoin </span></code></pre></div>
+<pre><code>transport:  http 
+host:       127.0.0.1 
+port:       9200 
+path:       NULL 
+username:   NULL 
+password:   &lt;secret&gt; 
+errors:     simple 
+headers (names):  NULL </code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># construire une requête</span>
+graylog_1185 &lt;-<span class="st"> </span><span class="kw">Search</span>(<span class="dt">index =</span> <span class="st">&quot;graylog_1185&quot;</span>, <span class="dt">asdf =</span> <span class="ot">TRUE</span>)  <span class="co"># paramètre size = 10 par défaut, mettre 0 pour avoir toutes les réponses</span>
+<span class="co"># asdf = TRUE permet de retourner un dataframe plutôt qu&#39;une liste</span>
+graylog_1185$hits$total</code></pre></div>
+<pre><code>[1] 2642721</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-9" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">graylog_1185$hits$hits$<span class="st">`</span><span class="dt">_source</span><span class="st">`</span> %&gt;%<span class="st"> </span>glimpse</code></pre></div>
+<pre><code>Observations: 10
+Variables: 39
+$ request                &lt;chr&gt; &quot;http://transatlantica.revues.org/7270&quot;...
+$ agent                  &lt;chr&gt; &quot;\&quot;Mozilla/5.0 (compatible; bingbot/2.0...
+$ geoip_real_region_name &lt;chr&gt; &quot;Washington&quot;, &quot;Washington&quot;, &quot;Washington...
+$ geoip_region_name      &lt;chr&gt; &quot;WA&quot;, &quot;WA&quot;, &quot;WA&quot;, NA, NA, NA, &quot;ON&quot;, NA,...
+$ geoip_location         &lt;chr&gt; &quot;[-122.1206,47.68010000000001]&quot;, &quot;[-122...
+$ auth                   &lt;chr&gt; &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;,...
+$ ident                  &lt;chr&gt; &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;, &quot;-&quot;,...
+$ geoip_postal_code      &lt;chr&gt; &quot;98052&quot;, &quot;98052&quot;, &quot;98052&quot;, NA, NA, NA, ...
+$ geoip_city_name        &lt;chr&gt; &quot;Redmond&quot;, &quot;Redmond&quot;, &quot;Redmond&quot;, NA, NA...
+$ source                 &lt;chr&gt; &quot;ccsdrv13&quot;, &quot;ccsdrv13&quot;, &quot;ccsdrv13&quot;, &quot;cc...
+$ type                   &lt;chr&gt; &quot;apache_access&quot;, &quot;apache_access&quot;, &quot;apac...
+$ gl2_source_input       &lt;chr&gt; &quot;572a0e9cedd76c1a6a56f6d6&quot;, &quot;572a0e9ced...
+$ geoip_continent_code   &lt;chr&gt; &quot;NA&quot;, &quot;NA&quot;, &quot;NA&quot;, &quot;NA&quot;, &quot;NA&quot;, &quot;EU&quot;, &quot;NA...
+$ geoip_dma_code         &lt;int&gt; 819, 819, 819, NA, NA, NA, NA, NA, NA, 819
+$ geoip_country_name     &lt;chr&gt; &quot;United States&quot;, &quot;United States&quot;, &quot;Unit...
+$ clientip               &lt;chr&gt; &quot;157.55.39.210&quot;, &quot;157.55.39.23&quot;, &quot;157.5...
+$ geoip_ip               &lt;chr&gt; &quot;157.55.39.210&quot;, &quot;157.55.39.23&quot;, &quot;157.5...
+$ gl2_source_node        &lt;chr&gt; &quot;5ede0295-ec50-4307-b224-7b4026c84170&quot;,...
+$ geoip_longitude        &lt;dbl&gt; -122.1206, -122.1206, -122.1206, -99.13...
+$ timestamp              &lt;chr&gt; &quot;2016-12-08 00:40:08.000&quot;, &quot;2016-12-08 ...
+$ level                  &lt;int&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
+$ geoip_area_code        &lt;int&gt; 425, 425, 425, NA, NA, NA, NA, NA, NA, 425
+$ geoip_coordinates      &lt;chr&gt; &quot;[-122.1206,47.68010000000001]&quot;, &quot;[-122...
+$ geoip_latitude         &lt;dbl&gt; 47.6801, 47.6801, 47.6801, 19.4300, 19....
+$ geoip_timezone         &lt;chr&gt; &quot;America/Los_Angeles&quot;, &quot;America/Los_Ang...
+$ streams                &lt;list&gt; [&lt;&quot;57f7b61eedd76c34aeb467f7&quot;, &quot;57f3b1a...
+$ verb                   &lt;chr&gt; &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET&quot;, &quot;GET...
+$ message                &lt;chr&gt; &quot;transatlantica.revues.org 157.55.39.21...
+$ command                &lt;chr&gt; &quot;/etc/logstash/allLogs&quot;, &quot;/etc/logstash...
+$ referrer               &lt;chr&gt; &quot;\&quot;-\&quot;&quot;, &quot;\&quot;-\&quot;&quot;, &quot;\&quot;-\&quot;&quot;, &quot;\&quot;https://j...
+$ geoip_country_code3    &lt;chr&gt; &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;MEX&quot;, &quot;MEX&quot;, &quot;FRA...
+$ geoip_country_code2    &lt;chr&gt; &quot;US&quot;, &quot;US&quot;, &quot;US&quot;, &quot;MX&quot;, &quot;MX&quot;, &quot;FR&quot;, &quot;CA...
+$ full_message           &lt;chr&gt; &quot;transatlantica.revues.org 157.55.39.21...
+$ response               &lt;chr&gt; &quot;200&quot;, &quot;200&quot;, &quot;404&quot;, &quot;200&quot;, &quot;200&quot;, &quot;200...
+$ bytes                  &lt;chr&gt; &quot;5651&quot;, &quot;6061&quot;, &quot;2104&quot;, &quot;1789&quot;, &quot;10988&quot;...
+$ domain                 &lt;chr&gt; &quot;transatlantica.revues.org&quot;, &quot;cdlm.revu...
+$ httpversion            &lt;chr&gt; &quot;1.1&quot;, &quot;1.1&quot;, &quot;1.0&quot;, &quot;1.1&quot;, &quot;1.1&quot;, &quot;1.1...
+$ location               &lt;chr&gt; &quot;47.68010000000001,-122.1206&quot;, &quot;47.6801...
+$ facility               &lt;chr&gt; &quot;gelf-rb&quot;, &quot;gelf-rb&quot;, &quot;gelf-rb&quot;, &quot;gelf-...</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-10" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ne retourner que certains champs</span>
+res &lt;-<span class="st"> </span><span class="kw">Search</span>(<span class="dt">index =</span> <span class="st">&quot;graylog_1185&quot;</span>, <span class="dt">fields =</span> <span class="kw">c</span>(<span class="st">&quot;geoip_country_name&quot;</span>, <span class="st">&quot;timestamp&quot;</span>, 
+    <span class="st">&quot;domain&quot;</span>), <span class="dt">asdf =</span> <span class="ot">TRUE</span>)
+res$hits$hits$fields</code></pre></div>
+<pre><code>   geoip_country_name               timestamp                    domain
+1       United States 2016-12-08 00:40:08.000 transatlantica.revues.org
+2       United States 2016-12-08 00:40:07.000           cdlm.revues.org
+3       United States 2016-12-08 00:40:08.000     noway.openedition.org
+4              Mexico 2016-12-08 00:40:08.000            jsa.revues.org
+5              Mexico 2016-12-08 00:40:08.000            jsa.revues.org
+6              France 2016-12-08 00:40:08.000               calenda.org
+7              Canada 2016-12-08 00:40:08.000       conflits.revues.org
+8              Mexico 2016-12-08 00:40:08.000            jsa.revues.org
+9              France 2016-12-08 00:40:08.000       www.openedition.org
+10      United States 2016-12-08 00:40:08.000  filstoria.hypotheses.org</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-11" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># trier les résultats</span>
+<span class="kw">Search</span>(<span class="dt">index =</span> <span class="st">&quot;graylog_1185&quot;</span>, <span class="dt">fields =</span> <span class="kw">c</span>(<span class="st">&quot;geoip_country_name&quot;</span>, <span class="st">&quot;timestamp&quot;</span>, 
+    <span class="st">&quot;domain&quot;</span>), <span class="dt">sort =</span> <span class="st">&quot;timestamp&quot;</span>, <span class="dt">asdf =</span> <span class="ot">TRUE</span>)$hits$hits %&gt;%<span class="st"> </span><span class="kw">select</span>(-<span class="st">`</span><span class="dt">_index</span><span class="st">`</span>, 
+    -<span class="st">`</span><span class="dt">_type</span><span class="st">`</span>, -<span class="st">`</span><span class="dt">_id</span><span class="st">`</span>, -<span class="st">`</span><span class="dt">_score</span><span class="st">`</span>, -sort)</code></pre></div>
+<pre><code>   fields.geoip_country_name        fields.timestamp
+1              United States 2016-12-07 22:59:57.000
+2             United Kingdom 2016-12-07 23:00:29.000
+3              United States 2016-12-07 23:01:35.000
+4              United States 2016-12-07 23:01:41.000
+5              United States 2016-12-07 23:01:42.000
+6              United States 2016-12-07 23:01:43.000
+7              United States 2016-12-07 23:01:43.000
+8              United States 2016-12-07 23:01:44.000
+9              United States 2016-12-07 23:01:44.000
+10             United States 2016-12-07 23:01:44.000
+             fields.domain
+1    books.openedition.org
+2  anthrovision.revues.org
+3           lrf.revues.org
+4           lrf.revues.org
+5      cybergeo.revues.org
+6       trivium.revues.org
+7    books.openedition.org
+8    books.openedition.org
+9    books.openedition.org
+10   books.openedition.org</code></pre>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-12" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<p>Elasticsearch a son propre DSL de requêtes, en JSON : <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html" class="uri">https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html</a></p>
+<p>Préparer la requête avec Graylog et l’implémenter ensuite…</p>
+</section><section id="acquerir-des-donnees-en-conditions-reelles-13" class="slide level2">
+<h2>Acquérir des données “en conditions réelles”</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># passer des requêtes</span>
+query &lt;-<span class="st"> &quot;{</span>
+<span class="ch">\&quot;</span><span class="st">query</span><span class="ch">\&quot;</span><span class="st">: {</span>
+<span class="st">  </span><span class="ch">\&quot;</span><span class="st">constant_score</span><span class="ch">\&quot;</span><span class="st">: {</span>
+<span class="st">    </span><span class="ch">\&quot;</span><span class="st">filter</span><span class="ch">\&quot;</span><span class="st">: [</span>
+<span class="st">      { </span><span class="ch">\&quot;</span><span class="st">term</span><span class="ch">\&quot;</span><span class="st">: { </span><span class="ch">\&quot;</span><span class="st">domain</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">books.openedition.org</span><span class="ch">\&quot;</span><span class="st">}},</span>
+<span class="st">      { </span><span class="ch">\&quot;</span><span class="st">range</span><span class="ch">\&quot;</span><span class="st">: { </span><span class="ch">\&quot;</span><span class="st">timestamp</span><span class="ch">\&quot;</span><span class="st">: { </span><span class="ch">\&quot;</span><span class="st">gte</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">2016-12-07 23:00:30.000</span><span class="ch">\&quot;</span><span class="st">}}}</span>
+<span class="st">    ]</span>
+<span class="st">  }</span>
+<span class="st"> }</span>
+<span class="st">}&quot;</span>
+results &lt;-<span class="st"> </span><span class="kw">Search</span>(<span class="dt">index =</span> <span class="st">&quot;graylog_1185&quot;</span>, <span class="dt">body =</span> query, <span class="dt">asdf =</span> <span class="ot">TRUE</span>, <span class="dt">size =</span> <span class="st">&quot;10000&quot;</span>, 
+    <span class="dt">scroll =</span> <span class="st">&quot;5m&quot;</span>)
+<span class="co"># results2 &lt;- scroll(results$`_scroll_id`, asdf = TRUE) results2 &lt;-</span>
+<span class="co"># Search(index = &#39;graylog_1185&#39;, body = query, asdf = TRUE, size = &#39;10000&#39;,</span>
+<span class="co"># from = &#39;10000&#39;)</span></code></pre></div>
+</section>
+<section id="visualiser-les-donnees" class="titleslide slide level1"><h2 class="shout">Visualiser les données</h2></section><section id="le-panorama-des-systemes-graphiques-de-r" class="slide level2">
+<h2>Le panorama des systèmes graphiques de R</h2>
+<ul>
+<li class="fragment next">base graphics : mélange bas niveau/haut niveau, complexe, pas très cohérent, mais rapide et puissant</li>
+<li class="fragment next">lattice : haut niveau, a une grammaire, plus très utilisé</li>
+<li class="fragment next">ggplot2 : haut niveau, grammaire cohérente, très puissant, très largement utilisé et <a href="http://ggplot.yhathq.com/">imité</a></li>
+</ul>
+</section>
+<section id="notre-outil-a-tout-faire-ggplot2" class="titleslide slide level1"><h2 class="shout">Notre outil à tout faire : ggplot2</h2></section><section id="la-notion-de-grammaire-de-visualisation" class="slide level2">
+<h2>La notion de grammaire de visualisation</h2>
+<ul>
+<li class="fragment next">données</li>
+<li class="fragment next">correspondances esthétiques (<code>aes</code>thetic mapping)</li>
+<li class="fragment next">couches (<code>layer</code>) : <code>geom</code> et <code>stat</code></li>
+<li class="fragment next">échelles (<code>scale</code>)</li>
+<li class="fragment next">un système de coordonnées (<code>coord</code>)</li>
+<li class="fragment next">petits multiples (<code>facet</code>)</li>
+<li class="fragment next">un thème (<code>theme</code>)</li>
+</ul>
+</section><section id="un-premier-exemple-simple" class="slide level2">
+<h2>Un premier exemple simple</h2>
+<ul>
+<li class="fragment next">choisir un jeu de données</li>
+<li class="fragment next">faire des graphiques descriptifs (univariés)</li>
+<li class="fragment next">faire des graphiques bivariés</li>
+<li class="fragment next">changer les <code>aes</code></li>
+<li class="fragment next">changer les <code>geom</code></li>
+<li class="fragment next">changer les <code>theme</code></li>
+</ul>
+</section><section id="un-premier-exemple-simple-1" class="slide level2">
+<h2>Un premier exemple simple</h2>
+<pre><code>
+Attaching package: &#39;rex&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:stringr&#39;:
+
+    regex</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    escape</code></pre>
+<pre><code>Rex functions and shortcuts attached!</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logs %&gt;%<span class="st"> </span><span class="kw">group_by</span>(verb) %&gt;%<span class="st"> </span><span class="kw">summarise</span>(<span class="dt">n =</span> <span class="kw">n</span>()) %&gt;%<span class="st"> </span>ungroup %&gt;%<span class="st"> </span><span class="kw">filter</span>(n &gt;<span class="st"> </span><span class="dv">100</span>) %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> verb, <span class="dt">y =</span> n)) +<span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>)</code></pre></div>
+<pre><code>Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<p><img src="jour2_files/figure-revealjs/unnamed-chunk-11-1.png" width="768" /></p>
+</section><section id="les-principaux-geom" class="slide level2">
+<h2>Les principaux <code>geom</code></h2>
+<ul>
+<li class="fragment next"><code>geom_point</code></li>
+<li class="fragment next"><code>geom_line</code></li>
+<li class="fragment next"><code>geom_text</code></li>
+<li class="fragment next"><code>geom_quantile</code></li>
+<li class="fragment next"><code>geom_histogram</code></li>
+<li class="fragment next"><code>geom_density</code></li>
+<li class="fragment next"><code>geom_smooth</code></li>
+<li class="fragment next"><code>geom_bar</code></li>
+<li class="fragment next">et même <code>geom_map</code></li>
+</ul>
+</section><section id="les-principaux-aesthetics" class="slide level2">
+<h2>Les principaux <code>aes</code>thetics</h2>
+<ul>
+<li class="fragment next"><code>x</code></li>
+<li class="fragment next"><code>y</code></li>
+<li class="fragment next"><code>colour</code></li>
+<li class="fragment next"><code>fill</code></li>
+<li class="fragment next"><code>size</code></li>
+<li class="fragment next">line width <code>lwd</code></li>
+<li class="fragment next">line type <code>lty</code></li>
+</ul>
+</section>
+
+  <!--
+  To hide progress bar from entire presentation
+  just remove “progress” element.
+  -->
+  <!-- <div class="progress"></div> -->
+  <script src="jour2_files/rmdshower/node_modules/shower/node_modules/shower-core/shower.min.js"></script>
+  <!-- Copyright © 2015 Yours Truly, Famous Inc. -->
+  <!-- Photos by John Carey, fiftyfootshadows.net -->
+
+    <script>renderMathInElement(document.body);</script>
+  
+  
+</body>
+</html>

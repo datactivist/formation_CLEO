@@ -1,0 +1,272 @@
+---
+title: "Introduction à R"
+author: CLEO et datactivi.st
+ratio: 16x10
+output:
+  rmdshower::shower_presentation:
+    self_contained: false
+    katex: true
+    theme: ribbon
+    incremental: true
+---
+
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=TRUE,
+               warning=TRUE)
+```
+
+
+## Introduction à R
+
+
+<p></p>
+<p></p><p></p><p>
+[Joël Gombin](mailto:joel@datactivi.st) et [Samuel Goëta](samuel@datactivi.st) ([datactivi.st](http://datactivi.st))
+</p>
+<p>
+Retrouvez les matériaux sur https://github.com/datactivist/formation_CLEO 
+</p>
+
+<p>
+Pad collaboratif : https://frama.link/cleo
+</p>
+
+## Objectifs de la journée
+
+
+```{r, echo = FALSE}
+library("DiagrammeR")
+mermaid(diagram = "
+graph LR
+  Importer -->  Nettoyer
+  Nettoyer --> Transformer
+  Transformer --> Visualiser
+  Visualiser --> Modeliser
+  Modeliser --> Transformer
+  Modeliser --> Communiquer")
+```
+
+## Objectifs de la journée
+
+- acquérir des données "en conditions réelles"
+- solidifer les acquis d'hier (tidy et transform)
+- apprendre à visualiser les données
+
+# Acquérir des données "en conditions réelles"
+
+## Acquérir des données "en conditions réelles"
+
+http://logs.openedition.org => explorer des agrégats de logs
+
+Possibilité de copier/coller les tableaux en local grâce à [`datapasta`](https://github.com/MilesMcBain/datapasta) (mais pas sur Rstudio server :/)
+
+## Acquérir des données "en conditions réelles"
+
+indicateurs qualité => https://tools.labocleo.org/indicateurs/
+
+Possibilité de télécharger CSV/lire depuis l'URL :
+
+Voir la page https://tools.labocleo.org/indicateurs/qualOE1.php?pf=OB par exemple
+
+## Acquérir des données "en conditions réelles"
+
+
+```{r message=FALSE, warning=FALSE}
+source("./auth.R", local = TRUE) # pour ne pas publier vos identifiants
+library(tidyverse)
+library(httr)
+indicateur <- GET("https://tools.labocleo.org/indicateurs/qualOE1.php?startYear=2009&endYear=2016&o=csv&pf=OB&index=openedition", auth) %>% 
+  content(as = "text") %>% 
+  read_tsv() 
+glimpse(indicateur)
+```
+
+
+## Acquérir des données "en conditions réelles"
+
+Graylog => https://graylog.labocleo.org/
+
+Exploration interactive des logs (quelques jours ?)
+
+Possibilités d'export CSV : voir `../data/graylog_hypo_1d.csv`
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+logs <- read_csv("../data/graylog_hypo_1d.csv")
+glimpse(logs)
+```
+
+## Acquérir des données "en conditions réelles"
+
+Exercice : explorer ces logs
+
+## Acquérir des données "en conditions réelles"
+
+Utiliser la base elasticsearch sous-jacente à graylogs :
+
+- elasticsearch : serveur d'indexation et de recherche de données
+- contient des "index"
+- package `elastic`
+
+À suivre : https://github.com/ropensci/elasticdsl
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+library(elastic)
+connect()  #passer des paramètres spécifiques si besoin 
+# construire une requête
+graylog_1185 <- Search(index = "graylog_1185", asdf = TRUE) # paramètre size = 10 par défaut, mettre 0 pour avoir toutes les réponses
+# asdf = TRUE permet de retourner un dataframe plutôt qu'une liste
+graylog_1185$hits$total
+```
+
+
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+graylog_1185$hits$hits$`_source` %>% glimpse
+```
+
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+# ne retourner que certains champs
+res <- Search(index = "graylog_1185", fields = c("geoip_country_name", "timestamp", "domain"), asdf = TRUE)
+res$hits$hits$fields
+```
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+# trier les résultats
+Search(index = "graylog_1185", fields = c("geoip_country_name", "timestamp", "domain"), sort = "timestamp", asdf = TRUE)$hits$hits %>% select(-`_index`, -`_type`, -`_id`, -`_score`, -sort)
+```
+
+## Acquérir des données "en conditions réelles"
+
+Elasticsearch a son propre DSL de requêtes, en JSON : https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+
+Préparer la requête avec Graylog et l'implémenter ensuite...
+
+
+## Acquérir des données "en conditions réelles"
+
+```{r, message=FALSE}
+# passer des requêtes
+query <- '{
+"query": {
+  "constant_score": {
+    "filter": [
+      { "term": { "domain": "books.openedition.org"}},
+      { "range": { "timestamp": { "gte": "2016-12-07 23:00:30.000"}}}
+    ]
+  }
+ }
+}'
+results <- Search(index = "graylog_1185", body = query, asdf = TRUE, size = "10000", scroll = "5m")
+# results2 <- scroll(results$`_scroll_id`, asdf = TRUE)
+# results2 <- Search(index = "graylog_1185", body = query, asdf = TRUE, size = "10000", from = "10000")
+```
+
+
+# Visualiser les données
+
+## Le panorama des systèmes graphiques de R
+
+- base graphics : mélange bas niveau/haut niveau, complexe, pas très cohérent, mais rapide et puissant
+- lattice : haut niveau, a une grammaire, plus très utilisé
+- ggplot2 : haut niveau, grammaire cohérente, très puissant, très largement utilisé et [imité](http://ggplot.yhathq.com/) 
+
+# Notre outil à tout faire : ggplot2
+
+## La notion de grammaire de visualisation
+
+- données
+- correspondances esthétiques (`aes`thetic mapping)
+- couches (`layer`) : `geom` et `stat`
+- échelles (`scale`)
+- un système de coordonnées (`coord`)
+- petits multiples (`facet`)
+- un thème (`theme`)
+
+## Un premier exemple simple
+
+- choisir un jeu de données
+- faire des graphiques descriptifs (univariés)
+- faire des graphiques bivariés
+- changer les `aes`
+- changer les `geom`
+- changer les `theme`
+
+## Un premier exemple simple
+
+```{r echo = FALSE}
+library(stringr)
+library(rex)
+rex_mode()
+valid_chars <- rex(one_of(regex('a-z0-9\u00a1-\uffff')))
+
+re <- rex(
+  #host name
+  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')),
+  #domain name
+  capture(name = "top_domaine",
+    group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars))
+    ),
+  #TLD identifier
+  group('.', valid_chars %>% at_least(2))
+)
+
+
+logs <- logs %>% 
+  filter(!domain %in% c("core.openedition.org", "f-origin.hypotheses.org")) %>% 
+  filter(!is.na(domain)) %>% 
+  filter(!str_detect(clientip, "192.168.178")) %>% 
+  filter(!str_detect(clientip, "193.48.96")) %>% 
+  mutate(top_domaine = re_matches(domain, re)$top_domaine)
+```
+
+```{r}
+logs %>% 
+  group_by(verb) %>% 
+  summarise(n = n()) %>%
+  ungroup %>% 
+  filter(n > 100) %>% 
+  ggplot(aes(x = verb, y = n)) +
+  geom_histogram(stat = "identity")
+
+```
+
+
+## Les principaux `geom`
+
+- `geom_point`
+- `geom_line`
+- `geom_text`
+- `geom_quantile`
+- `geom_histogram`
+- `geom_density`
+- `geom_smooth`
+- `geom_bar`
+- et même `geom_map`
+
+## Les principaux `aes`thetics
+
+- `x`
+- `y`
+- `colour`
+- `fill`
+- `size`
+- line width `lwd`
+- line type `lty`
+
