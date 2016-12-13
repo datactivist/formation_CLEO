@@ -2,6 +2,7 @@
 # logs <- import("../data/small_logs.csv")
 
 library(readr)
+# importer le CSV
 logs <- read_csv("../data/small_logs.csv", 
                  col_types = cols(
                    .default = col_character(),
@@ -16,15 +17,16 @@ logs <- read_csv("../data/small_logs.csv",
                    response = col_integer()
                  ))
 
+# reexporter en CSV
 write_excel_csv(logs, "./test.csv")
 
 library(tidyverse)
 
+# ne garder que les variables correspondant à une condition
 sub_logs <- logs %>% 
   select(contains("geoip"))
 
-# ceci est un commentaire
-
+# condition plus stricte pour le choix des variables
 logs %>% 
   select(starts_with("geoip"))
 
@@ -32,8 +34,18 @@ logs %>%
 #  filter(geoip_city_name == "Marseille") %>% 
   select(timestamp, agent, bytes) %>% 
   mutate(contenu_vide = if_else(bytes == 0, "vide", "non vide", missing = "absent")) %>% 
-  group_by(contenu_vide) %>% 
-  summarise(n())
+  group_by(contenu_vide) %>%  # group_by => pour chaque valeur de cette variable, on fait une opération
+  summarise(n = n())
+
+logs %>% 
+  #  filter(geoip_city_name == "Marseille") %>% 
+  select(timestamp, agent, bytes) %>% 
+  mutate(contenu_vide = if_else(bytes == 0, "vide", "non vide", missing = "absent")) %>% # créer une nouvelle variable en recodant selon que bytes est nul ou pas
+  group_by(contenu_vide) %>%  # group_by => pour chaque valeur de cette variable, on fait une opération
+#  rowwise() %>% # pour calculer ligne par ligne
+  mutate(n = n()) # si on veut modifier le dataframe d'origine
+  summarise(n = n()) # si on veut résumer le dataframe d'origine/ le tabuler (split/apply/combine)
+
 
 logs %>% 
   #  filter(geoip_city_name == "Marseille") %>% 
