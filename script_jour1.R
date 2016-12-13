@@ -83,8 +83,8 @@ logs %>%
   # on filtre les requêtes non pertinentes
   filter(!domain %in% c("core.openedition.org", "f-origin.hypotheses.org")) %>% 
   filter(!is.na(domain)) %>% 
-  filter(!str_detect(clientip, "192.168.178")) %>% 
-  filter(!str_detect(clientip, "193.48.96")) %>% 
+  filter(!str_detect(clientip, fixed("192.168.178"))) %>% 
+  filter(!str_detect(clientip, fixed("193.48.96"))) %>% 
   mutate(top_domaine = re_matches(domain, re)$top_domaine) %>% 
   group_by(top_domaine) %>% 
   summarise(n = n()) %>% 
