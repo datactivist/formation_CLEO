@@ -64,21 +64,23 @@ logs %>%
 
 library(rex)
 rex_mode()
-valid_chars <- rex(one_of(regex('a-z0-9\u00a1-\uffff')))
+valid_chars <- rex(one_of(regex('a-z0-9'))) # validation des caractères autorisés dans une URL
 
 re <- rex(
-  #host name
-  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')),
-  #domain name
+  # sous-domaine
+  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')), # possibilité d'un sous domaine, se finit par un point
+  # nom de domaine (1er niveau)
   capture(name = "top_domaine",
     group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars))
-    ),
+    ), # capture => permet de récupérer le bout qui nous intéresse
   #TLD identifier
-  group('.', valid_chars %>% at_least(2))
+  group('.', valid_chars %>% at_least(2)) # extension qui finit la regex
 )
 
 
 logs %>% 
+  # le point d'exclamation "!" correspond à NOT, la négation logique. Permet de prendre l'inverse d'une condition logique
+  # on filtre les requêtes non pertinentes
   filter(!domain %in% c("core.openedition.org", "f-origin.hypotheses.org")) %>% 
   filter(!is.na(domain)) %>% 
   filter(!str_detect(clientip, "192.168.178")) %>% 
@@ -91,7 +93,7 @@ logs %>%
 # passer en format long et vice versa
 
 logs %>% 
-  mutate(ID = row_number()) %>% 
-  gather(clé, valeur, -ID) %>% 
-  spread(clé, valeur) %>% 
-  mutate(timestamp = lubridate::as_datetime(as.integer(timestamp)))
+  mutate(ID = row_number()) %>% # créer un identifiant unique
+  gather(clé, valeur, -ID) %>% # passer de large en long, en gardant la variable ID comme identifiant
+  spread(clé, valeur) %>% # repasser de long en large
+  mutate(timestamp = lubridate::as_datetime(as.integer(timestamp))) # respécifier que timestamp est une variable de type datetime
