@@ -19,4 +19,32 @@ logs %>%
   ylab("Pays d'origine") +
   theme_bw()
   
-  
+logs_referrers <- read_csv("../data/graylog_hypo_1d_referers.csv")  
+
+library(rex)
+rex_mode()
+
+valid_chars <- rex(one_of(regex('a-z0-9'))) # validation des caractères autorisés dans une URL
+
+re <- rex(
+  # sous-domaine
+  group(
+    one_or_more('http'),
+    zero_or_more('s')
+    ),
+  capture(name = "referrer_propre",
+          group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')), # possibilité d'un sous domaine, se finit par un point
+  # nom de domaine (1er niveau)
+  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars)),
+  #TLD identifier
+  group('.', valid_chars %>% at_least(2)) # extension qui finit la regex
+  )
+)
+
+logs_referrers %>% 
+  filter(response %in% 200) %>% 
+  filter(verb %in% "GET") %>% 
+  # filtrer les robots ?
+  filter(!referrer %in% "\"-\"") %>% 
+  mutate(referrer_propre = )
+
