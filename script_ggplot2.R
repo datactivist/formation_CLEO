@@ -76,3 +76,17 @@ logs_referrers %>%
   facet_wrap(~ geoip_country_name, scales = "free") +
   coord_flip() 
 dev.off()
+
+pdf("horaires.pdf", 20, 15)
+logs_referrers %>% 
+  filter(response %in% 200) %>% 
+  filter(verb %in% "GET") %>% 
+  # filtrer les robots ?
+  filter(!referrer %in% "\"-\"") %>% 
+  group_by(geoip_country_name) %>% 
+  filter(n() > 10000) %>% 
+  ungroup %>% 
+  ggplot(aes(x = timestamp)) +
+  geom_histogram(bins = 96) +
+  facet_wrap(~ geoip_country_name, scales = "free")
+dev.off()
