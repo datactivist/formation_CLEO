@@ -43,7 +43,7 @@ logs %>%
   mutate(contenu_vide = if_else(bytes == 0, "vide", "non vide", missing = "absent")) %>% # créer une nouvelle variable en recodant selon que bytes est nul ou pas
   group_by(contenu_vide) %>%  # group_by => pour chaque valeur de cette variable, on fait une opération
 #  rowwise() %>% # pour calculer ligne par ligne
-  mutate(n = n()) # si on veut modifier le dataframe d'origine
+#  mutate(n = n()) # si on veut modifier le dataframe d'origine
   summarise(n = n()) # si on veut résumer le dataframe d'origine/ le tabuler (split/apply/combine)
 
 
