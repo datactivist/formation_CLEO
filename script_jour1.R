@@ -97,3 +97,4 @@ logs %>%
   gather(clé, valeur, -ID) %>% # passer de large en long, en gardant la variable ID comme identifiant
   spread(clé, valeur) %>% # repasser de long en large
   mutate(timestamp = lubridate::as_datetime(as.integer(timestamp))) # respécifier que timestamp est une variable de type datetime
+  #timestamp unix start from 1970 year
