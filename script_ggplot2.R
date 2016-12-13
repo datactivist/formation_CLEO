@@ -81,6 +81,8 @@ pdf("horaires.pdf", 20, 15)
 logs_referrers %>% 
   filter(response %in% 200) %>% 
   filter(verb %in% "GET") %>% 
+  filter(!str_detect(agent, c("bot", "muckrack", "duckduck"))) %>% 
+  filter(!str_detect(clientip, "204.79.180")) %>% 
   # filtrer les robots ?
   filter(!referrer %in% "\"-\"") %>% 
   group_by(geoip_country_name) %>% 
