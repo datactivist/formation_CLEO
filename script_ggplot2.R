@@ -28,10 +28,10 @@ valid_chars <- rex(one_of(regex('a-z0-9'))) # validation des caractères autoris
 
 re <- rex(
   # sous-domaine
-  group(
-    one_or_more('http'),
-    zero_or_more('s')
-    ),
+  # group(
+  #   one_or_more('http'),
+  #   zero_or_more('s')
+  #   ),
   capture(name = "referrer_propre",
           group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')), # possibilité d'un sous domaine, se finit par un point
   # nom de domaine (1er niveau)
@@ -46,5 +46,5 @@ logs_referrers %>%
   filter(verb %in% "GET") %>% 
   # filtrer les robots ?
   filter(!referrer %in% "\"-\"") %>% 
-  mutate(referrer_propre = )
+  mutate(referrer_propre = re_matches(referrer, re)$`referrer_propre`)
 
