@@ -41,10 +41,38 @@ re <- rex(
   )
 )
 
+re_deomaine <- rex(
+  # sous-domaine
+  # group(
+  #   one_or_more('http'),
+  #   zero_or_more('s')
+  #   ),
+  
+          group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')), # possibilité d'un sous domaine, se finit par un point
+          # nom de domaine (1er niveau)
+          capture(name = "domaine_propre",
+                  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars))
+                  ),
+          #TLD identifier
+          group('.', valid_chars %>% at_least(2)) # extension qui finit la regex
+)
+
+pdf(file = "./mongraphique.pdf", width = 15, height = 12)
 logs_referrers %>% 
   filter(response %in% 200) %>% 
   filter(verb %in% "GET") %>% 
   # filtrer les robots ?
   filter(!referrer %in% "\"-\"") %>% 
-  mutate(referrer_propre = re_matches(referrer, re)$`referrer_propre`)
-
+  mutate(referrer_propre = re_matches(referrer, re_deomaine)$`domaine_propre`) %>% 
+  filter(referrer_propre != "hypotheses") %>% 
+  group_by(geoip_country_name, referrer_propre) %>% 
+  summarise(n = n()) %>% 
+  group_by(geoip_country_name) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:10) %>% 
+  filter(n[1] > 2000) %>% 
+  ggplot(aes(x = referrer_propre, y = n)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ geoip_country_name, scales = "free") +
+  coord_flip() 
+dev.off()
