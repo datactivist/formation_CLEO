@@ -1,0 +1,601 @@
+---
+title: "Introduction à R"
+author: CLEO et datactivi.st
+ratio: 16x10
+output:
+  rmdshower::shower_presentation:
+    self_contained: false
+    katex: true
+    theme: ribbon
+    incremental: true
+    css: presentations.css
+---
+
+```{r, echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               tidy.opts=list(width.cutoff = 45),
+               comment=NA,
+               message=TRUE,
+               warning=TRUE)
+```
+
+
+## Introduction à R
+
+
+<p></p>
+<p></p><p></p><p>
+[Joël Gombin](mailto:joel@datactivi.st) et [Samuel Goëta](samuel@datactivi.st) ([datactivi.st](http://datactivi.st))
+</p>
+<p>
+Retrouvez les matériaux sur https://github.com/datactivist/formation_CLEO 
+</p>
+
+<p>
+Pad collaboratif : https://frama.link/cleo3
+</p>
+
+## Objectifs de la journée
+
+
+```{r, echo = FALSE}
+library("DiagrammeR")
+mermaid(diagram = "
+graph LR
+  Importer -->  Nettoyer
+  Nettoyer --> Transformer
+  Transformer --> Visualiser
+  Visualiser --> Modeliser
+  Modeliser --> Transformer
+  Modeliser --> Communiquer")
+```
+
+## Objectifs de la journée
+
+- appréhender les questions de recherche
+- acquérir des données "en conditions réelles" (solr, logs)
+- visualiser et analyser des distributions
+- cartographier
+- éléments de text mining
+
+# Questions de recherche
+
+## Questions de recherche
+
+=> Marin
+
+# Solr
+
+## Interroger solr depuis R
+
+- http://search.openedition.org/ => recherche tous documents OE
+- motorisé par solr
+- on peut interroger solr depuis R, grâce à [`solrium`](https://github.com/ropensci/solrium)
+
+## Interroger solr depuis R
+
+```{r, message=FALSE, warning=FALSE}
+library("solrium")
+library(tidyverse)
+solr_connect('http://147.94.102.65:8983/solr/documents/select')
+solr_search(q='*:*', rows = 20)
+```
+
+## Interroger solr depuis R
+
+```{r}
+solr_search(q='texte:gombin', rows = 100, sort = "datepubli asc", fl = c("naked_titre", "contributeur_auteur", "site_name", "url", "datepubli", "site_type")) %>% glimpse
+```
+
+## Interroger solr depuis R
+
+```{r}
+solr_search(q='naked_texte:"front national"', rows = 100, sort = "datepubli asc", fl = c("naked_titre", "contributeur_auteur", "naked_texte", "site_name", "url", "datepubli", "site_type")) %>% glimpse
+```
+
+## Interroger solr depuis R
+
+```{r}
+solr_facet(q = 'texte:gombin', facet.field = "site_name")$facet_fields$site_name
+```
+
+# logs
+
+## Lire des logs bruts dans R
+
+```{r, message=FALSE, warning=FALSE}
+logs <- read_log("../data/12012016-TOTAL-REVUES.log")
+names(logs) <- c("IP", "V1", "V2", "date_time", "request", "status", "bytes", "referrer", "user_agent")
+logs <- logs %>% select(-V1, -V2)
+logs %>% glimpse
+```
+
+## Lire des logs bruts dans R
+
+```{r}
+logs <- read_log("../data/revues.zip")
+names(logs) <- c("IP", "V1", "V2", "date_time", "request", "status", "bytes", "referrer", "user_agent")
+logs <- logs %>% select(-V1, -V2)
+logs %>% glimpse
+```
+
+## Lire des logs bruts dans R
+
+```{r}
+library(stringr)
+library(pathological)
+logs <- data_frame(path = list.files("../data/")[str_detect(list.files("../data/"), "12012016")]) %>% 
+  rowwise %>% 
+  do({
+    tmpname <- .
+    tmp <- read_log(paste0("../data/", tmpname))
+    names(tmp) <- c("IP", "V1", "V2", "date_time", "request", "status", "bytes", "referrer", "user_agent")
+    tmp <- tmp %>% 
+      select(-V1, -V2) %>% 
+      filter(status %in% 200) %>% 
+      select(-status)
+    tmp$file <- unlist(tmpname)
+    gc() #garbage collector
+    tmp
+    })
+
+```
+
+# Distributions
+
+## Visualiser une distribution
+
+```{r}
+library(rex)
+rex_mode()
+
+valid_chars <- rex(one_of(regex('a-z0-9'))) # validation des caractères autorisés dans une URL
+
+re <- rex(
+  capture(name = "domaine",
+          group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars), one_or_more('.')), # possibilité d'un sous domaine, se finit par un point
+  # nom de domaine (1er niveau)
+  group(zero_or_more(valid_chars, zero_or_more('-')), one_or_more(valid_chars)),
+  #TLD identifier
+  group('.', valid_chars %>% at_least(2)) # extension qui finit la regex
+  )
+)
+```
+
+## Visualiser une distribution
+
+```{r, eval = FALSE}
+logs %>% 
+  sample_n(100000) %>% 
+  mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!is.na(domaine)) %>% 
+  group_by(file, domaine) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  mutate(domaine = factor(domaine, levels = unique(domaine))) %>% 
+  ggplot(aes(x = n, group = file)) +
+  stat_ecdf(aes(color = file)) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+## Visualiser une distribution
+
+```{r, echo = FALSE}
+logs %>% 
+  sample_n(100000) %>% 
+  mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!is.na(domaine)) %>% 
+  group_by(file, domaine) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  mutate(domaine = factor(domaine, levels = unique(domaine))) %>% 
+  ggplot(aes(x = n, group = file)) +
+  stat_ecdf(aes(color = file)) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+
+## Résumer une distribution
+
+
+```{r}
+library(ineq)
+logs %>% 
+  sample_n(100000) %>% 
+  mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!is.na(domaine)) %>% 
+  group_by(file, domaine) %>% 
+  summarise(n = n()) %>% 
+  group_by(file) %>% 
+  summarise(gini = Gini(n))
+```
+
+# Cartographie
+
+## R, un potentiel cartographique énorme
+
+http://joelgombin.github.io/makingof.html
+
+## Des avantages
+
+- un workflow intégré
+- un workflow reproductible
+- une convergence des paradigmes de carto "statique" (print) et "dynamique" (web)
+- l'intégration dans des apps : http://shiny.rstudio.com/gallery/superzip-example.html
+
+## Quelques pistes/ressources
+
+- des capacités de base grâce à [`sp`](https://cran.r-project.org/web/packages/sp/vignettes/intro_sp.pdf) (et désormais [`sf`](https://github.com/edzer/sfr))
+- des capacités SIG grâce à `maptools`, `rgdal` et `rgeos`
+- des packages de cartographie de haut niveau : `cartography` et `tmap` 
+- des packages de cartographie interactive/web : `leaflet`, `mapview`, 
+
+# Notions de cartographie 
+
+## Qu'est-ce qu'une carte ? 
+
+"Une carte est une représentation géométrique plane simplifiée et conventionnelle de tout ou partie de la surface terrestre, et cela dans un rapport de similitude convenable qu'on appelle échelle." (F. Joly, 1976)
+
+
+Référence : [Béguin et Pumain, 2014 (3e éd.)](http://www.persee.fr/web/revues/home/prescript/article/espos_0755-7809_1998_num_16_1_1827_t1_0119_0000_2)
+
+## La notion de projection 
+
+La projection est l'outil mathématique qui permet de passer du géoïde représentant la Terre à une représentation plane. 
+
+Projections conformes (Mercator, Lambert) ou équivalentes (Eckert IV, Gall). Il y a toujours une déformation !
+
+Les coordonnées géographiques sont exprimées en longitude et latitude. Les unités peuvent être des degrés ou des grades. La projection transforme les coordonnées géographiques en coordonnées x/y. 
+
+## La notion de projection 
+
+Exemple de coordonnées géographiques :
+
+![largeur](./img/gmaps.png)
+
+## La notion de projection 
+
+Un truc cool pour jouer avec les différentes projections :
+
+http://bl.ocks.org/mbostock/raw/3711652/
+
+## La notion de projection 
+
+_The West Wing_, la série qui arrive à faire un sketch drôle sur les projections géographiques :
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vVX-PrBRtTY" frameborder="0" allowfullscreen></iframe>
+
+## L'échelle 
+
+L'échelle d'une carte représente le rapport d'une distance mesurée sur la carte à sa valeur réelle sur le terrain.
+
+Échelle        | 1 cm représente
+---------------|----------------
+1/10000        |100 m
+1/25000        |250m
+1/50000        |500m
+1/100000       |1km
+1/1000000      |10km
+
+
+## L'échelle 
+
+Attention : "petite échelle" = grande superficie représentée
+"grande échelle" = petite superficie représentée
+
+L'échelle est déformée à distance du centre de projection (équateur pour Mercator)
+
+Échelle numérique et échelle graphique
+
+## 
+
+![largeur](./img/carteParis1.png)
+
+## La généralisation 
+
+"L'opération qui par sélection, schématisation et harmonisation reconstitue sur une carte la réalité de la surface représentée dans ses traits essentiels en fonction du but de la carte, de son thème, de son échelle et des particularités de la région cartographiée."
+
+## La sélection 
+
+Quelles couches d'information représenter ? Ni trop (surcharge d'information, à la Google Maps) ni trop peu (rendre la carte intelligible au lecteur).
+
+Le [style "toner"](http://maps.stamen.com/toner/#12/37.7706/-122.3782) peut être utile pour trouver cet équilibre, en cartographie thématique :
+
+## 
+
+![largeur](./img/carteParis1.png)
+
+## La schématisation 
+
+Opération de simplification, qui peut être structurale (tracés) ou conceptuelle (schéma). 
+
+Attention : on peut simplifier à partir de données détaillées, mais on ne peut pas faire l'inverse ! Donc toujours veiller à conserver les données dans leur forme la plus détaillée. 
+
+
+## Le fond de carte 
+
+Le fond de carte est constitué des éléments repris d'une carte topographique (par exemple de l'IGN) et utilisés pour une carte thématique.
+
+"Carte reproduite totalement ou partiellement, en une ou plusieurs couleurs souvent atténuées, servant de repère pour le report en surcharge de phénomènes localisables déterminés" (CFC). Peut concerner les découpages administratifs, le réseau routier, hydrographique, les courbes de niveau, etc. 
+
+
+## Les sources de fonds de carte 
+
+Traditionnellement, en France : l'IGN.
+
+De plus en plus : Google Maps, Open Street Map, Stamen...
+
+##
+
+http://maps.stamen.com/toner/#12/48.8974/2.2017
+
+http://maps.stamen.com/watercolor/#12/48.8974/2.2017
+
+## Vecteur ou raster 
+
+Comment stocker et représenter l'information géographique ?
+
+- "Mode raster" : il s'agit d'une image, découpée en pixels. Des valeurs sont attribués aux pixels. Ex : photo satellite.
+- "Mode vecteur" : on utilise des objets géométriques (lignes, points, polygones...) auxquels sont associés des attributs. Ex : carte d'un réseau de transports.
+
+## 
+
+
+<iframe width="800" height="600" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=2.3314136266708374%2C48.866987337550164%2C2.33908474445343%2C48.87019135286425&amp;layer=transportmap" style="border: 1px solid black"></iframe>
+
+## 
+
+http://www.comeetie.fr/galerie/francepixels/#
+
+## Cartes choroplèthes 
+
+Une carte choroplèthe est une carte thématique où les régions sont colorées ou remplies d'un motif qui montre une mesure statistique, tels la densité de population ou le revenu par habitant. Ce type de carte facilite la comparaison d'une mesure statistique d'une région à l'autre ou montre la variabilité de celle-ci pour une région donnée.
+
+## Cartes en anamorphose ou cartogramme 
+
+"La cartographie en anamorphose a pour but d'adapter la forme de la carte non pas à la réalité physique mais plutôt à la réalité perçue." [(Langlois et Denain, 1996)](http://cybergeo.revues.org/129) 
+
+On déforme le fond de carte en fonction d'une variable quantitative (voire arbitrairement).
+
+##
+
+[![largeur](./img/carte2.png)](http://www.slate.fr/france/87669/cartes-europeennes-2014)
+
+## Le langage cartographique 
+
+[Bertin, 1965](http://classiques.uqac.ca/collection_methodologie/bertin_jacques/representations_visuelles_info/representations_visuelles_info_texte.html) : travail sur la sémiologie graphique. La carte, comme le graphique, permettent de percevoir *en même temps* trois informations (X,Y,Z).
+
+Mais pour que cette communication soit efficace, il faut respecter un langage précis et ses règles. 
+
+Assez comparable à la grammaire des graphiques.
+
+## Les composantes du langage cartographique 
+
+- les signes graphiques élémentaires : point, trait, tâche (aplat). 
+- le figuré cartographique : combinaison de signes graphiques élémentaires.
+- l'implantation graphique : manière d'appliquer le figuré sur la carte (ponctuelle, linéaire ou zonale).
+- les variables visuelles : façon de faire varier les signes graphiques. Il y en a sept.
+
+## Les variables visuelles 
+
+- forme
+- taille
+- couleur 
+- valeur 
+- orientation
+- texture-structure (trame)
+- grain
+
+## La forme 
+
+- Ne transcrit qu'une information qualitative. 
+- Veiller à ne pas utiliser trop de formes différentes, sinon cela devient illisible (< 10)
+- Utilisée dans les trois types d'implantation graphique. En implantation zonale => texture.
+
+## La taille 
+
+- longueur/hauteur/surface/volume
+- bonne perception visuelle par l'œil
+- rapport de proportionnalité entre information quantitative représentée et la forme
+- attention à respecter cette proportionnalité ! 
+- la taille est plus facile à estimer que la surface ou le volume
+
+Un exemple d'utilisation incorrecte (non-proportionnelle) de la taille :
+
+## La taille 
+
+![largeur](./img/UneMonde.png)
+
+## La taille 
+
+- Le cartogramme (anamorphose) comme cas particulier de l'utilisation de la taille.
+- [Créer un fonds de carte en anamorphose](http://scapetoad.choros.ch/)
+- [Réaliser un cartogramme en javascript](http://prag.ma/code/d3-cartogram/)
+
+## La couleur 
+
+* fort pouvoir différentiel
+* esthétique
+* trois propriétés :
+    + ton 
+    + saturation
+    + intensité
+  
+## La couleur
+
+http://hslpicker.com/
+
+## La couleur
+
+- En général, on utilise un seul ton et on joue sur l'intensité.
+
+<iframe src='./img/grenobleAbstention.html' width='700px' height='600px'></iframe>
+
+## La couleur
+
+- Parfois, par exemple pour représenter une variation, on peut jouer sur deux échelles de tons
+
+<iframe src='./img/amiensProgFN.html' width='700px' height='600px'></iframe>
+
+## La couleur
+
+- Si on représente une variable qualitative, on utilise autant de tons que de catégories
+
+<iframe src='./img/comm.couleur.html' width='700px' height='500px'></iframe>
+
+## La couleur 
+
+- Penser aux daltoniens !
+- Penser au support (web, papier...)
+- Des palettes de couleur de référence : [colorbrewer2.org](http://colorbrewer2.org/) par exemple
+- Un autre outil de construction de palette de couleur : [vis4.net/labs/multihue](https://vis4.net/labs/multihue/)
+- C'est la variable qu'on utilise le plus en cartographie thématique.
+
+## La valeur 
+
+- Valeur : rapport entre quantités totales de noir et de blanc perçues dans une surface donnée (cf. aussi "gris typographique"). 
+- Peut passer par une trame 
+- Peut concerner une couleur (un ton)
+- En général, on utilise des classes (max 6/7)
+- Mais parfois, coloration continue
+
+## La valeur 
+
+Un exemple de coloration continue :
+
+![largeur](./img/continue.jpg)
+
+##
+
+Des cartes _old school_ de densité, qui utilisent une trame :
+
+![largeur](./img/densite.jpg)
+
+##
+
+Une autre coloration continue (pas très lisible parce qu'elle utilise trop de teintes [hues]) :
+
+![largeur](./img/Purple-USA.jpg)
+
+## Le grain 
+
+- agrandissement ou réduction d'une texture/structure
+- pas très utilisé, car mal perçu par l'œil humain
+
+## L'orientation 
+
+- Angle d'un figuré linéaire
+- Pour variable qualitative, moins utilisé aujourd'hui
+
+## L'orientation 
+
+Un exemple d'utilisation par Todd et Le Bras :
+
+![largeur](./img/lebrastodd.jpg)
+
+## Distribution et découpage en classes des variables quantitatives 
+
+- discrétisation : découper une variable continue en classes
+- ce découpage n'est pas neutre, et ne peut être décidé indépendamment de la distribution de la variable représentée
+
+## Distribution et découpage en classes des variables quantitatives 
+
+Voir [cet article](http://www.persee.fr/web/revues/home/prescript/article/espos_0755-7809_2000_num_18_1_1930)
+
+Un [moyen sympa](http://franceo3.geoclip.fr/index.php?profil=FV#z=-349737,6562730,1033057,513716;l=fr;i=euro14.pt_lfn;v=map12) de jouer avec les différentes méthodes de discrétisation.
+
+## Et concrètement, on fait comment ?
+
+De très nombreux outils existent. QGIS est en train de s'imposer comme le SIG de référence dans le monde du libre. Malheureusement, en cartographie pure, aucune solution de référence ne permet de traiter aisément tous les cas de figure (vectoriel/raster ; print/web, etc.). En ce qui concerne la carto web, pas vraiment de solution de référence pour l'heure. 
+
+R n'est pas fait (du tout) au départ pour faire de la carto, mais offre aujourd'hui un _workflow_ complet allant du nettoyage des données à leur représentation cartographique en passant par le nettoyage, l'analyse et la transformation des données.
+
+# R et les données spatiales
+
+## Un objet spatial, c'est quoi ?
+
+- une collection de géométries (points, lignes, polygones), regroupées en couches (layers)
+- une table attributaire (des données)
+- un identifiant unique pour faire le lien entre les deux !
+- si les choses sont bien faites, une projection.
+
+## Formats spatiaux
+
+- le plus répandu, la référence : le shapefile (format défini par ESRI). Pose pas mal de problèmes : plusieurs fichiers (.shp, .dbf., .prj, .shx, etc.) ; nom des variables limité à 10 caractères ; pas de valeurs manquantes ; pas plus de 255 variables ; pas de fichiers de plus de 2GB...  
+- le format promu par Google : le KML
+- le nouveau standard de facto en ligne : GeoJSON
+- une version améliorée et topologique du GeoJSON : le topoJSON
+- etc. etc. 
+
+Il existe des outils libres pour passer d'un format à l'autre, en particulier OGR/GDAL. R possède des surcouches de ces librairies. 
+
+## Et dans R ?
+
+Plusieurs classes dans R pour représenter les objets spatiaux. La plus importante (et le seul qu'on utilisera) provient de la librairie `sp` et est `SpatialPolygonsDataFrame` (il existe aussi `SpatialPoints*` et `SpatialLines*`). 
+
+On peut créer un objet `SpatialPolygonsDataFrame` à la main, mais en réalité on ne le fait jamais, on importe un shapefile (ou autre) dans R. Plusieurs fonctions pour cela ; la meilleure est `readOGR`, dans le package `rgdal`.
+
+```{r message=FALSE, warning=FALSE}
+#install.packages("sp")
+#install.packages("rgdal")
+
+library(sp)
+library(rgdal)
+
+departements <- readOGR("./data/departements", "DEPARTEMENT", stringsAsFactors = FALSE)
+summary(departements)
+```
+
+## Et dans R ?
+
+Les objets `SpatialPolygonsDataFrame` sont complexes, mais comprennent pour simplifier d'une part les polygones (auxquels on accède directement : `departements[1,]`) et d'autre part le `dataframe`, qui est un `slot` de l'objet :
+
+```{r message=FALSE, warning=FALSE}
+summary(departements@data)
+library(tidyverse)
+departements@data %>%
+  filter(NOM_REGION %in% "ILE-DE-FRANCE")
+```
+
+## Et dans R ?
+
+On peut ainsi sélectionner une partie seulement d'un `SpatialPolygonsDataFrame`, en fonction de données de la table attributaire. 
+
+Nouveau package pour utiliser la syntaxe du `tidyverse` avec `sp` : https://cran.r-project.org/web/packages/spdplyr/vignettes/spdplyr.html
+
+```{r message=FALSE, warning=FALSE}
+library(spdplyr)
+iledefrance <- departements %>% 
+  filter(NOM_REGION %in% "ILE-DE-FRANCE")
+
+````
+
+## Et dans R ?
+
+On peut aisément visualiser les objets spatiaux au moyen de la fonction `plot` :
+
+```{r message=FALSE, warning=FALSE}
+plot(departements)
+
+## ou :
+## departements %>% plot()
+
+```
+
+## Et dans R ?
+
+Mais aussi grâce au package `mapview` :
+
+
+```{r message=FALSE, warning=FALSE}
+library(mapview)
+mapview(departements)
+mapview(departements, zcol = "CODE_REG")
+```
+
