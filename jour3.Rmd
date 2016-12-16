@@ -94,7 +94,7 @@ solr_search(q='texte:gombin', rows = 100, sort = "datepubli asc", fl = c("naked_
 ## Interroger solr depuis R
 
 ```{r}
-solr_search(q='naked_texte:"front national"', rows = 100, sort = "datepubli asc", fl = c("naked_titre", "contributeur_auteur", "naked_texte", "site_name", "url", "datepubli", "site_type")) %>% glimpse
+solr_search(q='naked_texte:"gombin"', rows = 500, sort = "datepubli asc", fl = c("naked_titre", "contributeur_auteur", "naked_texte", "site_name", "url", "datepubli", "site_type")) %>% glimpse
 ```
 
 ## Interroger solr depuis R
