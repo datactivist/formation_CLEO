@@ -127,18 +127,17 @@ logs %>% glimpse
 
 ```{r}
 library(stringr)
-library(pathological)
 logs <- data_frame(path = list.files("../data/")[str_detect(list.files("../data/"), "12012016")]) %>% 
   rowwise %>% 
   do({
-    tmpname <- .
+    tmpname <- .$path
     tmp <- read_log(paste0("../data/", tmpname))
     names(tmp) <- c("IP", "V1", "V2", "date_time", "request", "status", "bytes", "referrer", "user_agent")
     tmp <- tmp %>% 
       select(-V1, -V2) %>% 
       filter(status %in% 200) %>% 
       select(-status)
-    tmp$file <- unlist(tmpname)
+    tmp$file <- tmpname
     gc() #garbage collector
     tmp
     })
@@ -173,6 +172,7 @@ logs %>%
   sample_n(100000) %>% 
   mutate(domaine = re_matches(request, re)$domaine) %>% 
   filter(!is.na(domaine)) %>% 
+  filter(!str_detect(domaine, "openedition.org")) %>% 
   group_by(file, domaine) %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
@@ -190,6 +190,7 @@ logs %>%
   sample_n(100000) %>% 
   mutate(domaine = re_matches(request, re)$domaine) %>% 
   filter(!is.na(domaine)) %>% 
+  filter(!str_detect(domaine, "openedition.org")) %>% 
   group_by(file, domaine) %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
@@ -209,6 +210,7 @@ library(ineq)
 logs %>% 
   sample_n(100000) %>% 
   mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!str_detect(domaine, "openedition.org")) %>% 
   filter(!is.na(domaine)) %>% 
   group_by(file, domaine) %>% 
   summarise(n = n()) %>% 
@@ -216,6 +218,43 @@ logs %>%
   summarise(gini = Gini(n))
 ```
 
+## Résumer une distribution
+
+
+```{r}
+logs %>% 
+  sample_n(100000) %>% 
+  mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!str_detect(domaine, "openedition.org")) %>% 
+  filter(!is.na(domaine)) %>% 
+  group_by(file, domaine) %>% 
+  summarise(n = n()) %>% 
+  group_by(file) %>% 
+  arrange(desc(n)) %>% 
+  mutate(ecdf = cumsum(n) / sum(n)) %>% 
+  ggplot(aes(x = ecdf, group = file)) +
+  stat_ecdf(aes(color = file)) +
+  coord_flip() 
+```
+
+## Résumer une distribution
+
+
+```{r}
+deciles <- logs %>% 
+  sample_n(100000) %>% 
+  mutate(domaine = re_matches(request, re)$domaine) %>% 
+  filter(!str_detect(domaine, "openedition.org")) %>% 
+  filter(!is.na(domaine)) %>% 
+  group_by(file, domaine) %>% 
+  summarise(n = n()) %>% 
+  group_by(file) %>% 
+  arrange(desc(n)) %>% 
+  mutate(ecdf = cumsum(n) / sum(n)) %>% 
+  do(data_frame(probs = seq(0, 1, by = 0.1), 
+                quantiles = quantile(.$n, probs = seq(0, 1, by = 0.1))
+                ))
+```
 # Cartographie
 
 ## R, un potentiel cartographique énorme
